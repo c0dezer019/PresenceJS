@@ -6,7 +6,8 @@ const globalCmds = fs.readdirSync('./services/commands/global').filter(file => f
 const guildCmds = fs.readdirSync('./services/commands/guild').filter(file => file.endsWith('.js'));
 const events = fs.readdirSync('./services/events').filter(file => file.endsWith('.js'));
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES,
+    Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_VOICE_STATES, Intents.FLAGS.GUILD_MEMBERS] });
 client.commands = new Collection();
 
 for (const file of globalCmds) {
