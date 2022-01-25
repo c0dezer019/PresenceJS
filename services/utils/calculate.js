@@ -1,6 +1,6 @@
 const { intervalToDuration } = require('date-fns');
 
-export const timeIdle = datetime => {
+const timeIdle = datetime => {
     const currentTime = new Date();
     const timeDelta = Math.abs(currentTime - datetime); // Returns an a time delta in milliseconds.
     const duration = intervalToDuration({ start: 0, end: timeDelta });
@@ -13,8 +13,10 @@ export const timeIdle = datetime => {
     return timeStr.join(', ').trim();
 };
 
-export const avg = arrOfValues => {
+const avg = arrOfValues => {
     const reducer = (last, current) => last + current;
     const sum = arrOfValues.reduce(reducer);
     return sum / arrOfValues.length;
 };
+
+module.exports = { timeIdle, avg }
