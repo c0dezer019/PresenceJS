@@ -1,3 +1,5 @@
+const db = require('../database/models');
+
 module.exports = {
     name: 'interactionCreate',
     async execute(interaction, client) {
