@@ -26,11 +26,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       get() {
         const id = this.getDataValue('memberId');
-        const tag = this.getDataValue('tag');
-        return this.getDataValue('username') + '#' + tag + ' (' + id + ')';
+        const discriminator = this.getDataValue('discriminator');
+        return this.getDataValue('username') + '#' + discriminator + ' (' + id + ')';
       }
     },
-    tag: {
+    discriminator: {
       type: DataTypes.INTEGER,
       allowNull: false,
       unique: false,
@@ -74,7 +74,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     avgIdleTime: {
       type: DataTypes.INTEGER,
-      validate: { isNumeric: true }
+      validate: { isNumeric: true },
     },
     status: {
       type: DataTypes.STRING,

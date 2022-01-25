@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      tag: {
+      discriminator: {
         type: Sequelize.INTEGER,
         allowNull: false
       },
