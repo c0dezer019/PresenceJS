@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   membersGuilds.init({
     memberId: DataTypes.INTEGER,
-    toyId: DataTypes.INTEGER
+    guildId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'membersGuilds',
