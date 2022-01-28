@@ -10,7 +10,13 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
+    get idleStr() { return timeIdle(this.lastActiveTs) }
+    get user() {
+      return this.username + '#' + this.discriminator + ' (' + this.memberId + ')';
+    }
+
     static associate(models) {
+      models.member.hasMany(models.node);
       models.member.belongsToMany(models.guild, { through: "membersGuilds" });
     }
   }
@@ -18,38 +24,23 @@ module.exports = (sequelize, DataTypes) => {
     username: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: false,
       validate: {
-        min: 2,
-        max: 32,
-        isAlphanumeric: true,
+        len: [2, 32],
       },
-      get() {
-        const id = this.getDataValue('memberId');
-        const discriminator = this.getDataValue('discriminator');
-        return this.getDataValue('username') + '#' + discriminator + ' (' + id + ')';
-      }
     },
     discriminator: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      unique: false,
       validate: {
         min: 4,
         isNumeric: true,
       }
     },
-    memberId: {
+    snowflakeID: {
       type: DataTypes.BIGINT,
       allowNull: false,
       unique: true,
-      validate: {
-        isNumeric: true,
-        min: 17,
-        isWithinRange(value) {
-          new Date()
-        }
-      }
+      validate: { isNumeric: true }
     },
     lastActiveServer: {
       type: DataTypes.BIGINT,
@@ -62,10 +53,10 @@ module.exports = (sequelize, DataTypes) => {
     lastActiveTs: {
       type: DataTypes.DATE,
       validate: { isDate: true },
-      get() { return timeIdle(this.getDataValue('lastActiveTs')) }
+
     },
     idleTimes: {
-      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      type: DataTypes.ARRAY(DataTypes.BIGINT),
       validate: {
         isArrayOfInts(value) {
           if (!Array.isArray(value) || typeof value[value.length - 1] !== "number") throw new Error('Must be an array of integers.');
@@ -78,14 +69,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     status: {
       type: DataTypes.STRING,
-      allowNull: false,
       defaultValue: 'new',
       validate: {
         isAlpha: true,
-        isValidStatus(value) {
-          if (value !== 'new' || value !== 'active' || value !== 'inactive') throw new Error('Status must be either ' +
-              '"new", "active", or "inactive"');
-        }
+        isIn: ['new', 'active', 'idle']
       }
     }
   }, {

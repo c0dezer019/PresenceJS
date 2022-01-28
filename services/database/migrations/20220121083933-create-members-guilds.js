@@ -11,7 +11,7 @@ module.exports = {
       memberId: {
         type: Sequelize.INTEGER
       },
-      toyId: {
+      guildId: {
         type: Sequelize.INTEGER
       },
       createdAt: {

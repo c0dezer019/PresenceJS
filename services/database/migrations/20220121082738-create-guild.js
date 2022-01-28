@@ -1,4 +1,6 @@
 'use strict';
+const settings = JSON.stringify(require('../../utils/guildSettings'));
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.createTable('guilds', {
@@ -12,7 +14,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      guildId: {
+      snowflakeID: {
         type: Sequelize.BIGINT,
         allowNull: false,
       },
@@ -24,6 +26,10 @@ module.exports = {
       },
       avgIdleTime: {
         type: Sequelize.INTEGER,
+      },
+      settings: {
+        type: Sequelize.JSON,
+        defaultValue: settings
       },
       status: {
         type: Sequelize.STRING,

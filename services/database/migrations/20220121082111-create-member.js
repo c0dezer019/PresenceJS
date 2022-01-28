@@ -16,7 +16,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false
       },
-      memberId: {
+      snowflakeID: {
         type: Sequelize.BIGINT,
         allowNull: false,
       },
