@@ -10,24 +10,26 @@ module.exports = {
             if (message.content === '?reset') {
                 await db.guild.findOrCreate({
                     where: {
-                        guild: message.guild.name,
+                        name: message.guild.name,
                         snowflakeID: message.guild.id,
-                        status: "new",
                     }
                 }).then(async ([newGuild, created]) => {
-                    if (created) {
                         await message.guild.members.fetch().then(members => {
-                            members.forEach(member => {
-                                db.member.findOrCreate({
-                                    where: {
+                            members.forEach(async member => {
+                               db.member.findOrCreate({
+                                   where: {
                                         snowflakeID: member.id,
                                         username: member.user.username,
                                         discriminator: member.user.discriminator,
-                                    }
+                                   },
+                                   include: [db.node, db.guild],
                                 })
-                                    .then(([newMember, created]) => {
+                                    .then(async ([newMember, created]) => {
+                                        await newGuild.addMember(newMember);
+
                                         if (created) {
-                                            newMember.createNode({
+                                            await newMember.createNode({
+                                                memberId: newMember.id,
                                                 guildSnowflakeID: message.guild.id,
                                                 memberSnowflakeID: member.id,
                                                 username: member.user.username,
@@ -35,12 +37,25 @@ module.exports = {
                                                 nickname: member.nickname,
                                                 botAdmin: member.id === s.bot_owner, // Better functionality to come.
                                             });
+                                        } else {
+                                            await db
+                                                .guild
+                                                .findOne({
+                                                    where: {
+                                                        snowflakeID: message.guild.id,
+                                                    },
+                                                    include: [{
+                                                        model: db.member,
+                                                        include: db.node
+                                                    }]
+                                                })
+                                                .then(console.log)
+                                                .catch(console.error)
                                         }
                                     })
                                     .catch(console.error);
                             });
                         });
-                    }
                 });
             }
         } else

@@ -16,8 +16,8 @@ module.exports = (sequelize, DataTypes) => {
     }
 
     static associate(models) {
-      models.member.hasMany(models.node);
-      models.member.belongsToMany(models.guild, { through: "membersGuilds" });
+      models.member.hasMany(models.node, { onDelete: 'CASCADE' });
+      models.member.belongsToMany(models.guild, { through: "membersGuilds", onDelete: 'CASCADE'});
     }
   }
   member.init({

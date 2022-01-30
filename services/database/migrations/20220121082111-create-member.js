@@ -20,10 +20,6 @@ module.exports = {
         type: Sequelize.BIGINT,
         allowNull: false,
       },
-      nickname: {
-        type: Sequelize.STRING,
-        defaultValue: `${this.username}`,
-      },
       lastActiveServer: {
         type: Sequelize.BIGINT,
       },

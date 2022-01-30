@@ -10,7 +10,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      guild: {
+      name: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -18,8 +18,15 @@ module.exports = {
         type: Sequelize.BIGINT,
         allowNull: false,
       },
+      memberCount: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+      },
       lastActiveTs: {
         type: Sequelize.DATE,
+      },
+      lastActiveChannel: {
+        type: Sequelize.BIGINT,
       },
       idleTimes: {
         type: Sequelize.ARRAY(Sequelize.INTEGER),

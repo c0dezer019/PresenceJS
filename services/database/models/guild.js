@@ -1,8 +1,7 @@
-'use strict';
-
+'use strict'
 const { Model } = require('sequelize');
-const { timeIdle } = require('../../utils/calculate.js');
-const settings = JSON.stringify(require('../../utils/guildSettings'));
+const { timeIdle } = require('../../utils/calculate');
+const settings = JSON.stringify(require('../../utils/settings'));
 
 module.exports = (sequelize, DataTypes) => {
   class guild extends Model {
@@ -14,11 +13,11 @@ module.exports = (sequelize, DataTypes) => {
     get idleStr() { return timeIdle(this.lastActiveTs) }
 
     static associate(models) {
-      models.guild.belongsToMany(models.member, { through: 'membersGuilds' });
+      models.guild.belongsToMany(models.member, { through: 'membersGuilds', onDelete: 'CASCADE' });
     }
   }
   guild.init({
-    guild: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -32,9 +31,16 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
       validate: { isNumeric: true }
     },
+    memberCount: {
+      type: DataTypes.INTEGER,
+    },
     lastActiveTs: {
       type: DataTypes.DATE,
       validate: { isDate: true },
+    },
+    lastActiveChannel: {
+      type: DataTypes.BIGINT,
+      validate: { isNumeric: true },
     },
     idleTimes: {
       type: DataTypes.ARRAY(DataTypes.INTEGER),

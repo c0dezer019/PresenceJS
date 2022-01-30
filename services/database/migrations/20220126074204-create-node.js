@@ -56,7 +56,7 @@ module.exports = {
       },
       memberId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        foreignKey: true,
       },
       createdAt: {
         allowNull: false,

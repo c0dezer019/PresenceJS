@@ -10,8 +10,17 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
+    get usernameWhole() {
+      const id = this.snowflakeID;
+      const discriminator = this.discriminator;
+      const username = this.username;
+
+      return username + '#' + discriminator + ' (' + id + ')';
+    }
+    get idleTime() { return timeIdle(this.lastActiveTs) }
+
     static associate(models) {
-      models.node.belongsTo(models.member);
+      models.node.belongsTo(models.member, { onDelete: 'CASCADE' } );
     }
   }
   node.init({
@@ -31,12 +40,6 @@ module.exports = (sequelize, DataTypes) => {
         len: [2, 32],
         notNull: true,
       },
-      get() {
-        const id = this.getDataValue('memberId');
-        const discriminator = this.getDataValue('discriminator');
-
-        return this.getDataValue('username') + '#' + discriminator + ' (' + id + ')';
-      }
     },
     discriminator: {
       type: DataTypes.INTEGER,
@@ -103,7 +106,6 @@ module.exports = (sequelize, DataTypes) => {
     lastActiveTs: {
       type: DataTypes.DATE,
       validate: { isDate: true },
-      get() { return timeIdle(this.getDataValue('lastActiveTs')) }
     },
     avgIdleTime: {
       type: DataTypes.INTEGER,
@@ -115,7 +117,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     memberId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      foreignKey: true,
       validate: { isNumeric: true },
     },
   }, {
