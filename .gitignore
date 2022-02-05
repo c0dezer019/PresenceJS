@@ -121,3 +121,7 @@ dist
 
 # AWS
 /Services/database/docker-compose.yml
+
+#Qodoba
+/reports
+qodana.*
