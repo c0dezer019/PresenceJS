@@ -2,7 +2,7 @@
 const {
   Model
 } = require('sequelize');
-const {timeIdle} = require("../../utils/calculate");
+const { timeIdle } = require("../../utils/calculate");
 module.exports = (sequelize, DataTypes) => {
   class node extends Model {
     /**
@@ -10,14 +10,6 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    get usernameWhole() {
-      const id = this.snowflakeID;
-      const discriminator = this.discriminator;
-      const username = this.username;
-
-      return username + '#' + discriminator + ' (' + id + ')';
-    }
-    get idleTime() { return timeIdle(this.lastActiveTs) }
 
     static associate(models) {
       models.node.belongsTo(models.member, { onDelete: 'CASCADE' } );
@@ -32,22 +24,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BIGINT,
       allowNull: false,
       validate: { isNumeric: true, notNull: true },
-    },
-    username: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        len: [2, 32],
-        notNull: true,
-      },
-    },
-    discriminator: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      validate: {
-        len: 4,
-        notNull: true,
-      }
     },
     nickname: {
       type: DataTypes.STRING,
@@ -106,6 +82,15 @@ module.exports = (sequelize, DataTypes) => {
     lastActiveTs: {
       type: DataTypes.DATE,
       validate: { isDate: true },
+    },
+    idleString: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return timeIdle(this.lastActiveTs);
+      },
+      set() {
+        throw new Error('idleString is not settable.');
+      },
     },
     avgIdleTime: {
       type: DataTypes.INTEGER,
