@@ -16,14 +16,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.BIGINT,
       },
-      username: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      discriminator: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
       nickname: {
         type: Sequelize.STRING,
       },
