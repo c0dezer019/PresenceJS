@@ -2,6 +2,7 @@
 
 const { Model } = require('sequelize');
 const { timeIdle } = require('../../utils/calculate.js');
+const settings = JSON.stringify(require('../../utils/memberSettings'));
 
 module.exports = (sequelize, DataTypes) => {
   class member extends Model {
@@ -26,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       validate: {
         len: [2, 32],
+        notNull: true,
       },
     },
     discriminator: {
@@ -35,6 +37,24 @@ module.exports = (sequelize, DataTypes) => {
         min: 4,
         isNumeric: true,
       }
+    },
+    fullUsername: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return `${this.username}#${this.discriminator}`;
+      },
+      set() {
+        throw new Error("fullUsername field is not settable.");
+      }
+    },
+    usernameWithId: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        return `${this.username}#${this.discriminator} (id: ${this.snowflakeID})`
+      },
+      set() {
+        throw new Error('usernameWithId is not settable.');
+      },
     },
     snowflakeID: {
       type: DataTypes.BIGINT,
@@ -74,7 +94,28 @@ module.exports = (sequelize, DataTypes) => {
         isAlpha: true,
         isIn: ['new', 'active', 'idle']
       }
-    }
+    },
+    settings: {
+      type: DataTypes.JSON,
+      defaultValue: settings,
+      validate: {
+        isJSON (value) {
+          if (typeof value !== 'string') throw new Error('Must be in JSON format.');
+
+          try {
+            const json = JSON.parse(value);
+            return (typeof json === 'object');
+          }
+          catch (err) {
+            throw new Error('Invalid JSON.');
+          }
+
+        },
+      },
+      get() {
+        return JSON.parse(this.getDataValue('settings'));
+      }
+    },
   }, {
     sequelize,
     modelName: 'member',

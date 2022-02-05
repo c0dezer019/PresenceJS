@@ -1,7 +1,7 @@
-'use strict'
-const { Model } = require('sequelize');
 const { timeIdle } = require('../../utils/calculate');
-const settings = JSON.stringify(require('../../utils/settings'));
+const { Model } = require('sequelize');
+const settings = JSON.stringify(require('../../utils/guildSettings'));
+
 
 module.exports = (sequelize, DataTypes) => {
   class guild extends Model {
@@ -19,11 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   guild.init({
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        min: 2,
-        max: 30,
-      }
+      validate: { len: [2, 30] },
     },
     snowflakeID: {
       type: DataTypes.BIGINT,
@@ -60,6 +56,7 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         isJSON (value) {
           if (typeof value !== 'string') throw new Error('Must be in JSON format.');
+
           try {
             const json = JSON.parse(value);
             return (typeof json === 'object');
@@ -67,7 +64,20 @@ module.exports = (sequelize, DataTypes) => {
           catch (err) {
             throw new Error('Invalid JSON.');
           }
-        }
+
+        },
+      },
+      get() {
+        return JSON.parse(this.getDataValue('settings'));
+      },
+      set(val) {
+        const o = JSON.parse(this.getDataValue('settings'));
+
+        Object.entries(o).forEach(([key]) => {
+          o[key] = val;
+        });
+
+        this.setDataValue('settings', JSON.stringify(o));
       },
     },
     status: {
@@ -76,7 +86,7 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         isAlpha: true,
         isIn: ['new', 'active', 'idle'],
-      }
+      },
     },
   }, {
     sequelize,
