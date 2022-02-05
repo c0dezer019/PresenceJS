@@ -1,5 +1,5 @@
-const db = require('../database/models');
 const s = require('../utils/settings.js');
+const crud = require('../utils/CRUD/CRUD');
 
 module.exports = {
     name: 'messageCreate',
@@ -8,60 +8,14 @@ module.exports = {
         if (message.content.startsWith('?')) {
             if (message.author.id !== s.bot_owner) return;
             if (message.content === '?reset') {
-                await db.guild.findOrCreate({
-                    where: {
-                        name: message.guild.name,
-                        snowflakeID: message.guild.id,
-                    }
-                }).then(async ([newGuild, created]) => {
-                        await message.guild.members.fetch().then(members => {
-                            members.forEach(async member => {
-                               db.member.findOrCreate({
-                                   where: {
-                                        snowflakeID: member.id,
-                                        username: member.user.username,
-                                        discriminator: member.user.discriminator,
-                                   },
-                                   include: [db.node, db.guild],
-                                })
-                                    .then(async ([newMember, created]) => {
-                                        await newGuild.addMember(newMember);
-
-                                        if (created) {
-                                            await newMember.createNode({
-                                                memberId: newMember.id,
-                                                guildSnowflakeID: message.guild.id,
-                                                memberSnowflakeID: member.id,
-                                                username: member.user.username,
-                                                discriminator: member.user.discriminator,
-                                                nickname: member.nickname,
-                                                botAdmin: member.id === s.bot_owner, // Better functionality to come.
-                                            });
-                                        } else {
-                                            await db
-                                                .guild
-                                                .findOne({
-                                                    where: {
-                                                        snowflakeID: message.guild.id,
-                                                    },
-                                                    include: [{
-                                                        model: db.member,
-                                                        include: db.node
-                                                    }]
-                                                })
-                                                .then(console.log)
-                                                .catch(console.error)
-                                        }
-                                    })
-                                    .catch(console.error);
-                            });
-                        });
-                });
+                await crud.guild(await message.guild);
+            } else if(message.content === '?count') {
+                console.log(message.guild.constructor.name)
             }
         } else
-            message.guild.members.fetch().then(members => {
-                members.forEach(member => console.log(member.id))
-            });
+            await crud.guild(await message.guild).update({
+                lastActiveTs: Date.now(),
+            })
     }
 }
 
